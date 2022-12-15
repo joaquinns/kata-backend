@@ -1,13 +1,15 @@
-import express, { Express, Request, Response } from "express";
-import dotenv from "dotenv";
+// enviroment
+import dotenv from 'dotenv'
+import server from './src/server'
+import { logError, logSuccess } from './src/utils/logger'
 
-dotenv.config();
+dotenv.config()
 
-const app: Express = express();
-const port: string | number = process.env.PORT || 4000;
+const port = process.env.PORT || 8080
+server.listen(port, () => {
+  logSuccess(`[SERVER RUN] Listening on: http://localhost:${port}/api`)
+})
 
-app.get("/", (_req: Request, res: Response) => {
-  return res.json("Care chimpa funziona papu");
-});
-
-app.listen(port, () => console.log(`Listening on port: ${port}`));
+server.on('error', (error) => {
+  logError(`[SERVER ERROR] ${error}`)
+})
