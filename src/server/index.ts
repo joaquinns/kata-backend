@@ -10,6 +10,9 @@ const server: Express = express()
 // define server to use '/api' and routes
 server.use('/api', router)
 
+// static server
+server.use(express.static('/public'))
+
 // security config
 server.use(helmet())
 server.use(cors())
