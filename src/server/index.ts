@@ -5,14 +5,18 @@ import swaggerDoc from '../../public/swagger.json'
 // security
 import cors from 'cors'
 import helmet from 'helmet'
-//routes
 import mongoose from 'mongoose'
+//routes
 import router from '../routes'
 import { logInfo } from '../utils/logger'
 
 dotenv.config()
 
 const server: Express = express()
+
+// security config
+server.use(helmet())
+server.use(cors())
 
 // content-type config
 server.use(express.urlencoded({ extended: true, limit: '50mb' }))
@@ -37,11 +41,7 @@ server.use(express.static('/public'))
 mongoose.connect(process.env.DB_HOST as string)
 logInfo(process.env.DB_HOST as string)
 
-// security config
-server.use(helmet())
-server.use(cors())
-
-server.get('/', (req: Request, res: Response) => {
+server.get('/', (_req: Request, res: Response) => {
   res.redirect('/api')
 })
 
