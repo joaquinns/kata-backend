@@ -5,10 +5,10 @@ export interface Example {
 }
 
 export interface IUserController {
-  getUsers: (id?: string) => Promise<UserType | UserType[] | undefined>
-  deleteUser: (id: string) => Promise<any>
+  getUsers: (id?: UserType['id']) => Promise<UserType | UserType[] | undefined>
+  deleteUser: (id: UserType['id']) => Promise<any>
   createUser: (user: UserType) => Promise<UserType>
-  updateUser: (id: string, user: any) => Promise<any>
+  updateUser: (id: UserType['id'], user: any) => Promise<any>
 }
 
 export interface IAuthController {
