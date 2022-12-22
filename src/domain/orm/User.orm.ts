@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
-import { UserType } from '../../controllers/types'
+import { ErrorResponse, UserType } from '../../controllers/types'
 import { logError } from '../../utils/logger'
 import { userEntity } from '../entities/User.entity'
 import { IAuth } from '../interfaces/auth.interface'
@@ -20,12 +20,18 @@ export const getAllUsers = async (): Promise<UserType[] | undefined> => {
   }
 }
 
-export const getUser = async (id: string): Promise<UserType | undefined> => {
+export const getUser = async (
+  id: UserType['id']
+): Promise<UserType | ErrorResponse> => {
   try {
-    const user = await userModel.findById(id)
+    const user = await userModel.findById(id).select('-password')
     return user
   } catch (error) {
     logError(`[ORM ERROR FINDING USER]: ${error}`)
+    return {
+      error: 'NOT FOUND',
+      msg: 'User not found'
+    }
   }
 }
 
@@ -37,7 +43,10 @@ export const createUser = async (user: UserType): Promise<any> => {
   }
 }
 
-export const updateUser = async (id: string, user: any): Promise<any> => {
+export const updateUser = async (
+  id: UserType['id'],
+  user: any
+): Promise<any> => {
   try {
     return await userModel.findByIdAndUpdate(id, user)
   } catch (error) {
@@ -45,7 +54,7 @@ export const updateUser = async (id: string, user: any): Promise<any> => {
   }
 }
 
-export const deleteUser = async (id: string): Promise<any> => {
+export const deleteUser = async (id: UserType['id']): Promise<any> => {
   try {
     return await userModel.deleteOne({ _id: id })
   } catch (error) {
@@ -55,7 +64,7 @@ export const deleteUser = async (id: string): Promise<any> => {
 
 export const loginUser = async (
   auth: IAuth
-): Promise<{ user: UserType | undefined; token: string } | undefined> => {
+): Promise<{ user?: UserType; token: string } | undefined> => {
   try {
     let userFound: UserType | undefined = undefined
     await userModel
