@@ -1,17 +1,18 @@
-import { Delete, Get, Post, Query, Route, Tags } from 'tsoa'
+import { Delete, Get, Post, Put, Query, Route, Tags } from 'tsoa'
 import {
   createUser,
   deleteUser,
   getAllUsers,
-  getUser
+  getUser,
+  updateUser
 } from '../domain/orm/User.orm'
 import { logSuccess } from '../utils/logger'
-import { User } from './interfaces'
+import { IUserController } from './interfaces'
 import { UserType } from './types'
 
 @Route('/api/users')
 @Tags('UserController')
-export class UserController implements User {
+export class UserController implements IUserController {
   /**
    * Endpoint to retrieve users from the DB
    * @param { string | undefined } userId
@@ -19,7 +20,7 @@ export class UserController implements User {
    */
 
   @Get('/')
-  public async getUsers(@Query() id?: string) {
+  public async getUsers(@Query() id?: UserType['id']) {
     if (id) {
       logSuccess(`[/api/users?id=${id}] Get user`)
       return await getUser(id)
@@ -29,8 +30,14 @@ export class UserController implements User {
   }
 
   @Post('/')
-  public async createUser(user: UserType) {
-    return await createUser(user)
+  public async createUser(user: UserType): Promise<UserType> {
+    const newUser = await createUser(user)
+    return newUser
+  }
+
+  @Put('/')
+  public async updateUser(id: UserType['id'], user: any) {
+    return await updateUser(id, user)
   }
 
   /**
@@ -40,7 +47,7 @@ export class UserController implements User {
    */
 
   @Delete('/')
-  public async deleteUser(@Query() id: string) {
+  public async deleteUser(@Query() id: UserType['id']) {
     logSuccess(`[/api/users?id=${id}] Deleting user`)
     return await deleteUser(id)
   }
