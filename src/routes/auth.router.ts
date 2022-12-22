@@ -1,7 +1,8 @@
-import { UserType } from '@/controllers/types'
 import bcrypt from 'bcrypt'
 import express, { Request, Response } from 'express'
 import { AuthController } from '../controllers/auth.controller'
+import { UserType } from '../controllers/types'
+import { verifyToken } from '../middlewares/verifyToken.middleware'
 
 const authRoute = express.Router()
 
@@ -20,7 +21,7 @@ authRoute.route('/register').post(async (req: Request, res: Response) => {
 })
 
 authRoute.route('/login').post(async (req: Request, res: Response) => {
-  const {email, password} = req.body
+  const { email, password } = req.body
   const auth = {
     email,
     password
@@ -28,5 +29,21 @@ authRoute.route('/login').post(async (req: Request, res: Response) => {
   const response = await authController.loginUser(auth)
   return res.json(response)
 })
+
+authRoute
+  .route('/profile')
+  .get(verifyToken, async (req: Request, res: Response) => {
+    const id: any = req?.query?.id
+
+    if (id) {
+      const response = await authController.userData(id)
+      return res.json(response)
+    }
+
+    return res.status(401).json({
+      error: 'not query provided',
+      msg: 'You need to pass a query id'
+    })
+  })
 
 export default authRoute
