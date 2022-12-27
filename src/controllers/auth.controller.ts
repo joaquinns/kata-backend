@@ -10,9 +10,9 @@ import { AuthResponse, ErrorResponse, UserType } from './types'
 export class AuthController implements IAuthController {
   /**
    * Endpoint to register a user
+   *
    */
 
-  @Post('/register')
   public async registerUser(user: UserType) {
     return await createUser(user)
   }
@@ -45,7 +45,7 @@ export class AuthController implements IAuthController {
    */
 
   @Get('/profile')
-  public async userData(@Query() id: UserType['id']): Promise<any> {
+  public async userData(@Query() id: string): Promise<any> {
     let response: any = ''
     if (id) {
       logSuccess(`[api/auth/profile] Get user data by the ID`)
