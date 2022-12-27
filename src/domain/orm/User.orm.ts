@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
 import { ErrorResponse, UserType } from '../../controllers/types'
+import { UserResponse } from '../../controllers/types/userResponse.types'
 import { logError } from '../../utils/logger'
 import { userEntity } from '../entities/User.entity'
 import { IAuth } from '../interfaces/auth.interface'
@@ -12,16 +13,40 @@ const jwtSecret = process.env.JWT_SECRET as string
 
 const userModel = userEntity()
 
-export const getAllUsers = async (): Promise<UserType[] | undefined> => {
+export const getAllUsers = async (
+  page: number,
+  limit: number
+): Promise<UserResponse | undefined> => {
   try {
-    return await userModel.find({ isDelete: false })
+    const response: UserResponse = {
+      users: [],
+      totalPages: 0,
+      currentPage: page
+    }
+    // Search for user with pagination
+    await userModel
+      .find({ isDelete: false })
+      .select('-password')
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec()
+      .then((users: UserType[]) => {
+        response.users = users
+      })
+
+    await userModel.countDocuments().then((total: number) => {
+      response.totalPages = Math.ceil(total / limit)
+      response.currentPage = page
+    })
+
+    return response
   } catch (error) {
     logError(`[ORM ERROR GETTING ALL THE USERS]: ${error}`)
   }
 }
 
 export const getUser = async (
-  id: UserType['id']
+  id: string
 ): Promise<UserType | ErrorResponse> => {
   try {
     const user = await userModel.findById(id).select('-password')
@@ -43,10 +68,7 @@ export const createUser = async (user: UserType): Promise<any> => {
   }
 }
 
-export const updateUser = async (
-  id: UserType['id'],
-  user: any
-): Promise<any> => {
+export const updateUser = async (id: string, user: any): Promise<any> => {
   try {
     return await userModel.findByIdAndUpdate(id, user)
   } catch (error) {
@@ -54,7 +76,7 @@ export const updateUser = async (
   }
 }
 
-export const deleteUser = async (id: UserType['id']): Promise<any> => {
+export const deleteUser = async (id: string): Promise<any> => {
   try {
     return await userModel.deleteOne({ _id: id })
   } catch (error) {
