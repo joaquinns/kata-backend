@@ -22,7 +22,7 @@ export const verifyToken = (
   let jwtToken = req.headers['x-access-token'] as string
 
   if (!jwtToken) {
-    return res.status(403).send({
+    return res.status(401).send({
       authenticationError: 'Missing or not valid token',
       message: 'Unauthorized'
     })
