@@ -10,10 +10,12 @@ const userController: UserController = new UserController()
 usersRoute
   .route('/')
   .get(async (req: Request, res: Response) => {
-    let userId = req?.query?.id as string | undefined
+    const userId = req?.query?.id as string | undefined
+    const page = (req?.query?.page as number | undefined) || 1
+    const limit = (req?.query?.limit as number | undefined) || 10
     logInfo(`Query param: ${userId}`)
-    const response: any = await userController.getUsers(userId)
-    return res.send(response)
+    const response = await userController.getUsers(page, limit, userId)
+    return res.json(response)
   })
   .delete(async (req: Request, res: Response) => {
     let userId = req.query.id as string
