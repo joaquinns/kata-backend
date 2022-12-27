@@ -67,7 +67,10 @@ export const createKata = async (kata: any): Promise<any> => {
 export const updateKata = async (id: string, kata: any): Promise<any> => {
   try {
     // make return the updated document in mongoose
-    return await kataModel.findByIdAndUpdate(id, kata)
+    return await kataModel.findByIdAndUpdate(id, kata, {
+      // option to return the updated doc
+      returnDocument: 'after'
+    })
   } catch (error) {
     logError(`[ORM ERROR UPDATING USER]: ${error}`)
   }
