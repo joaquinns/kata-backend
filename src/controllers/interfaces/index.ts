@@ -1,17 +1,29 @@
-import { BasicResponse, UserType } from '../types'
+import { BasicResponse, ErrorResponse, UserType } from '../types'
+import { UserResponse } from '../types/userResponse.types'
 
 export interface Example {
   getMessage: (name?: string) => Promise<BasicResponse>
 }
 
 export interface IUserController {
-  getUsers: (id?: UserType['id']) => Promise<UserType | UserType[] | undefined>
-  deleteUser: (id: UserType['id']) => Promise<any>
+  getUsers: (
+    page: number,
+    limit: number,
+    id?: string
+  ) => Promise<UserType | UserResponse | undefined | ErrorResponse>
+  deleteUser: (id: string) => Promise<any>
   createUser: (user: UserType) => Promise<UserType>
-  updateUser: (id: UserType['id'], user: any) => Promise<any>
+  updateUser: (id: string, user: any) => Promise<any>
 }
 
 export interface IAuthController {
   registerUser: (user: UserType) => Promise<any>
   loginUser: (auth: any) => Promise<any>
+}
+
+export interface IKataController {
+  getKatas: (page: number, limit: number, id?: string) => Promise<any>
+  deleteKata: (id: string) => Promise<any>
+  createKata: (kata: any) => Promise<any>
+  updateKata: (id: string, kata: any) => Promise<any>
 }
